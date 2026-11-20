@@ -1,4 +1,8 @@
-using Scalar.AspNetCore; 
+using Scalar.AspNetCore;
+using BiblioTech2.Api.Data;
+using BiblioTech2.Api.Services;
+using BiblioTech2.Api.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);  // inicializa una nueva instancia, encargada de leer la configuración de la aplicación (appsettings.json, variables de entorno, etc.)
                                                    // y de configurar los servicios que la aplicación necesita para funcionar correctamente)
@@ -8,6 +12,11 @@ var builder = WebApplication.CreateBuilder(args);  // inicializa una nueva insta
 builder.Services.AddControllers(); // llama a la carpeta Controllers y registra todos los controladores que encuentre en ella, para que puedan ser utilizados por la aplicación
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi(); // scalar 
+
+builder.Services.AddScoped<IAutorService, AutorService>();
+builder.Services.AddDbContext<BibliotecaContext>(opciones =>
+opciones.UseSqlServer(builder.Configuration.GetConnectionString("BiblioTechConnection")));
+
 
 var app = builder.Build(); // toma la configuracion y los servicios que de declararon posteriormente y construye la aplicación,
                            // pasando al estado para recibir solicitudes HTTP y generar respuestas
@@ -19,7 +28,7 @@ var app = builder.Build(); // toma la configuracion y los servicios que de decla
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.MapScalarApiReference(); 
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection(); //si la solicitud entrante es HTTP, la redirige a HTTPS para garantizar una comunicación segura entre el cliente y el servidor
